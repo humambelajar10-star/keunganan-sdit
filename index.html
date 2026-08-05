@@ -12,7 +12,7 @@
     .bg-gradient-hero { background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #1e40af 100%); }
     @media print {
       body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; font-size: 11px !important; }
-      header, nav, .no-print, #loginScreen, #modalDetailTrans { display: none !important; }
+      header, nav, .no-print, #loginScreen, #modalDetailTrans, #modalUbahPass { display: none !important; }
       .tab-content { display: none !important; }
       .tab-content:not(.hidden) { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
       #areaCetakLaporan:not(.hidden) { display: block !important; border: none !important; padding: 0 !important; }
@@ -24,6 +24,34 @@
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 pb-20 md:pb-6">
+
+  <!-- MODAL UBAH PASSWORD -->
+  <div id="modalUbahPass" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-sm w-full p-6">
+      <div class="flex justify-between items-center pb-3 border-b mb-4">
+        <h3 class="text-sm font-bold text-slate-800">🔑 Ubah Password Admin</h3>
+        <button onclick="closeModalUbahPass()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center text-xs">✕</button>
+      </div>
+      <form onsubmit="handleProsesUbahPass(event)">
+        <div class="mb-3">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Password Lama</label>
+          <input type="password" id="passLamaInput" placeholder="••••••••" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs" required>
+        </div>
+        <div class="mb-3">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Password Baru</label>
+          <input type="password" id="passBaruInput" placeholder="••••••••" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs" required>
+        </div>
+        <div class="mb-5">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Konfirmasi Password Baru</label>
+          <input type="password" id="passKonfirmInput" placeholder="••••••••" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs" required>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="closeModalUbahPass()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Batal</button>
+          <button type="submit" id="btnSimpanPass" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- MODAL DETAIL TRANSAKSI -->
   <div id="modalDetailTrans" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden">
@@ -92,10 +120,15 @@
           </div>
           <div>
             <h1 class="text-base font-extrabold leading-tight tracking-tight">SDIT Aladzievie</h1>
-            <p class="text-[11px] text-blue-200"><span id="sessNama" class="font-semibold text-white">Ustadz Admin</span> (Admin Utama)</p>
+            <p class="text-[11px] text-blue-200"><span id="sessNama" class="font-semibold text-white">Ustadz Admin</span></p>
           </div>
         </div>
-        <button onclick="logout()" class="p-2 bg-blue-700/80 hover:bg-blue-800 rounded-lg text-white transition text-xs flex items-center justify-center" title="Logout">🚪</button>
+        <div class="flex items-center gap-2">
+          <button onclick="openModalUbahPass()" class="px-2.5 py-1.5 bg-blue-700/80 hover:bg-blue-800 rounded-lg text-white transition text-xs font-semibold flex items-center gap-1 shadow-sm">
+            <span>🔑</span><span class="hidden sm:inline">Ubah Pass</span>
+          </button>
+          <button onclick="logout()" class="p-2 bg-blue-700/80 hover:bg-blue-800 rounded-lg text-white transition text-xs flex items-center justify-center" title="Logout">🚪</button>
+        </div>
       </div>
     </header>
 
@@ -107,7 +140,7 @@
           <div class="relative z-10 space-y-3">
             <span class="bg-amber-400 text-slate-900 text-[10px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider shadow-sm">SDIT ALADZIEVIE</span>
             <h2 class="text-2xl font-black tracking-tight">Selamat Datang! 👋</h2>
-            <p class="text-xs text-blue-100 leading-relaxed font-medium" id="homeWelcomeAdmin">Ustadz Admin (Admin Utama)</p>
+            <p class="text-xs text-blue-100 leading-relaxed font-medium" id="homeWelcomeAdmin">Ustadz Admin</p>
             <div class="pt-4 flex items-center justify-between text-[11px] text-blue-200 border-t border-white/10">
               <span>🏢 Gedung Utama</span>
               <span class="font-bold">Versi Supabase 3.0</span>
@@ -473,7 +506,7 @@
     
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    var currentAdminNama = '';
+    var currentAdminObj = null;
     var globalSiswaList = [];
     var globalSiswaBayarList = [];
     var activeRekapMode = 'TABUNGAN';
@@ -494,7 +527,7 @@
 
       btn.disabled = false; btn.innerText = 'Masuk Aplikasi';
       if (data) {
-        currentAdminNama = data.nama;
+        currentAdminObj = data;
         document.getElementById('sessNama').innerText = data.nama;
         document.getElementById('homeWelcomeAdmin').innerText = data.nama;
         document.getElementById('loginScreen').classList.add('hidden');
@@ -505,8 +538,52 @@
     }
 
     function logout() {
+      currentAdminObj = null;
       document.getElementById('appScreen').classList.add('hidden');
       document.getElementById('loginScreen').classList.remove('hidden');
+    }
+
+    // MODAL UBAH PASSWORD
+    function openModalUbahPass() {
+      document.getElementById('passLamaInput').value = '';
+      document.getElementById('passBaruInput').value = '';
+      document.getElementById('passKonfirmInput').value = '';
+      document.getElementById('modalUbahPass').classList.remove('hidden');
+    }
+
+    function closeModalUbahPass() {
+      document.getElementById('modalUbahPass').classList.add('hidden');
+    }
+
+    async function handleProsesUbahPass(e) {
+      e.preventDefault();
+      var passLama = document.getElementById('passLamaInput').value;
+      var passBaru = document.getElementById('passBaruInput').value;
+      var passKonfirm = document.getElementById('passKonfirmInput').value;
+
+      if (!currentAdminObj) return alert('Sesi habis, silakan re-login.');
+
+      if (passLama !== currentAdminObj.password) {
+        return alert('Password lama tidak sesuai!');
+      }
+
+      if (passBaru !== passKonfirm) {
+        return alert('Konfirmasi password baru tidak cocok!');
+      }
+
+      var btn = document.getElementById('btnSimpanPass');
+      btn.disabled = true; btn.innerText = 'Memproses...';
+
+      const { error } = await db.from('admin').update({ password: passBaru }).eq('id', currentAdminObj.id);
+
+      btn.disabled = false; btn.innerText = 'Simpan';
+      if (!error) {
+        currentAdminObj.password = passBaru;
+        alert('Password berhasil diperbarui!');
+        closeModalUbahPass();
+      } else {
+        alert('Gagal mengubah password: ' + error.message);
+      }
     }
 
     function switchTab(tabId) {
@@ -568,7 +645,7 @@
         kelas: siswaObj.kelas,
         jenis: jenis,
         nominal: nominal,
-        petugas: currentAdminNama
+        petugas: currentAdminObj ? currentAdminObj.nama : 'Admin'
       }]);
 
       btn.disabled = false; btn.innerText = 'Simpan Tabungan';
@@ -623,7 +700,7 @@
         jenis_bayar: jenisBayar,
         ket_bulan: ketBulan,
         nominal: nominal,
-        petugas: currentAdminNama
+        petugas: currentAdminObj ? currentAdminObj.nama : 'Admin'
       }]);
 
       btn.disabled = false; btn.innerText = 'Simpan Pembayaran';
