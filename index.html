@@ -138,9 +138,9 @@
               <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">📊</div>
               <span class="text-xs font-bold text-slate-700">Rekap Bulanan</span>
             </button>
-            <button onclick="switchTab('tab-laporan')" class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition text-center flex flex-col items-center gap-2">
-              <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">📄</div>
-              <span class="text-xs font-bold text-slate-700">Laporan Siswa</span>
+            <button onclick="switchTab('tab-admin')" class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition text-center flex flex-col items-center gap-2">
+              <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">👤</div>
+              <span class="text-xs font-bold text-slate-700">Kelola Admin</span>
             </button>
           </div>
         </div>
@@ -395,27 +395,73 @@
         </div>
       </section>
 
+      <!-- TAB 7: KELOLA ADMIN -->
+      <section id="tab-admin" class="tab-content hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h3 class="font-bold text-slate-800 mb-4 border-b pb-3 text-sm">👤 Tambah Admin Baru</h3>
+            <form onsubmit="handleTambahAdmin(event)">
+              <div class="mb-3">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Lengkap Admin</label>
+                <input type="text" id="adminNamaInput" placeholder="Contoh: Ustadz Ahmad" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs" required>
+              </div>
+              <div class="mb-3">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Username Login</label>
+                <input type="text" id="adminUserInput" placeholder="Contoh: ahmad" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs" required>
+              </div>
+              <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Password</label>
+                <input type="password" id="adminPassInput" placeholder="••••••••" class="w-full border border-slate-200 rounded-xl p-2.5 text-xs" required>
+              </div>
+              <button type="submit" id="btnSimpanAdmin" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">Simpan Admin</button>
+            </form>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 md:col-span-2">
+            <h3 class="font-bold text-slate-800 mb-4 border-b pb-3 text-sm">📋 Daftar Admin Terdaftar</h3>
+            <div class="overflow-y-auto max-h-80">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="bg-slate-50 border-b">
+                    <th class="p-2.5">Nama Admin</th>
+                    <th class="p-2.5">Username</th>
+                    <th class="p-2.5 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tabelAdminBody">
+                  <tr><td colspan="3" class="p-4 text-center text-slate-400">Memuat data admin...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
 
+    <!-- NAVIGATION BAR -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 shadow-lg no-print">
       <div class="max-w-md mx-auto flex justify-around items-center py-2 px-1">
         <button onclick="switchTab('tab-home')" id="nav-tab-home" class="nav-item flex flex-col items-center gap-1 text-blue-600 font-bold">
-          <span class="text-lg">🏠</span><span class="text-[10px]">Beranda</span>
+          <span class="text-lg">🏠</span><span class="text-[9px]">Beranda</span>
         </button>
         <button onclick="switchTab('tab-transaksi')" id="nav-tab-transaksi" class="nav-item flex flex-col items-center gap-1 text-slate-400 font-medium">
-          <span class="text-lg">💰</span><span class="text-[10px]">Tabungan</span>
+          <span class="text-lg">💰</span><span class="text-[9px]">Tabungan</span>
         </button>
         <button onclick="switchTab('tab-pembayaran')" id="nav-tab-pembayaran" class="nav-item flex flex-col items-center gap-1 text-slate-400 font-medium">
-          <span class="text-lg">💳</span><span class="text-[10px]">Pembayaran</span>
+          <span class="text-lg">💳</span><span class="text-[9px]">Bayar</span>
         </button>
         <button onclick="switchTab('tab-kas')" id="nav-tab-kas" class="nav-item flex flex-col items-center gap-1 text-slate-400 font-medium">
-          <span class="text-lg">💵</span><span class="text-[10px]">Kas</span>
+          <span class="text-lg">💵</span><span class="text-[9px]">Kas</span>
         </button>
         <button onclick="switchTab('tab-rekap')" id="nav-tab-rekap" class="nav-item flex flex-col items-center gap-1 text-slate-400 font-medium">
-          <span class="text-lg">📊</span><span class="text-[10px]">Rekap</span>
+          <span class="text-lg">📊</span><span class="text-[9px]">Rekap</span>
         </button>
         <button onclick="switchTab('tab-laporan')" id="nav-tab-laporan" class="nav-item flex flex-col items-center gap-1 text-slate-400 font-medium">
-          <span class="text-lg">📄</span><span class="text-[10px]">Laporan</span>
+          <span class="text-lg">📄</span><span class="text-[9px]">Laporan</span>
+        </button>
+        <button onclick="switchTab('tab-admin')" id="nav-tab-admin" class="nav-item flex flex-col items-center gap-1 text-slate-400 font-medium">
+          <span class="text-lg">👤</span><span class="text-[9px]">Admin</span>
         </button>
       </div>
     </nav>
@@ -484,6 +530,7 @@
 
       if (tabId === 'tab-kas') loadKasSekolah();
       if (tabId === 'tab-rekap') loadRekapData();
+      if (tabId === 'tab-admin') loadDaftarAdmin();
     }
 
     // TABUNGAN
@@ -787,19 +834,14 @@
         if (!error) {
           alert('Transaksi berhasil dihapus!');
           
-          // 1. Refresh Modal Rincian
           openDetailModalForStudent(currentActiveNis, '');
-          
-          // 2. Refresh Tabel Rekap Bulanan
           loadRekapData();
 
-          // 3. AUTO-REFRESH Tabel Histori Pembayaran di Tab Pembayaran
           var selectSiswaBayar = document.getElementById('pilihSiswaBayar');
           if (selectSiswaBayar && selectSiswaBayar.value === currentActiveNis) {
             loadHistoriBayarSiswa(currentActiveNis);
           }
 
-          // 4. AUTO-REFRESH Tabel Laporan jika sedang dibuka
           var selectSiswaLaporan = document.getElementById('pilihSiswaLaporan');
           if (selectSiswaLaporan && selectSiswaLaporan.value === currentActiveNis) {
             loadBukuTabungan();
@@ -807,6 +849,66 @@
 
         } else {
           alert('Gagal hapus: ' + error.message);
+        }
+      }
+    }
+
+    // KELOLA ADMIN
+    async function loadDaftarAdmin() {
+      var tbody = document.getElementById('tabelAdminBody');
+      tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Memuat data admin...</td></tr>';
+
+      const { data: list, error } = await db.from('admin').select('*').order('id', { ascending: true });
+      if (error || !list) {
+        tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Gagal memuat daftar admin.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      for (var i = 0; i < list.length; i++) {
+        var a = list[i];
+        tbody.innerHTML += '<tr class="border-b hover:bg-slate-50">' +
+          '<td class="p-2.5 font-bold text-slate-800">' + a.nama + '</td>' +
+          '<td class="p-2.5 text-slate-500">' + a.username + '</td>' +
+          '<td class="p-2.5 text-center"><button onclick="confirmHapusAdmin(' + a.id + ', \'' + a.username + '\')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 text-[10px] px-2.5 py-1 rounded-lg font-bold">Hapus</button></td>' +
+          '</tr>';
+      }
+    }
+
+    async function handleTambahAdmin(e) {
+      e.preventDefault();
+      var nama = document.getElementById('adminNamaInput').value;
+      var username = document.getElementById('adminUserInput').value;
+      var password = document.getElementById('adminPassInput').value;
+      var btn = document.getElementById('btnSimpanAdmin');
+
+      btn.disabled = true; btn.innerText = 'Menyimpan...';
+
+      const { error } = await db.from('admin').insert([{ username: username, password: password, nama: nama }]);
+
+      btn.disabled = false; btn.innerText = 'Simpan Admin';
+      if (!error) {
+        alert('Admin baru berhasil ditambahkan!');
+        document.getElementById('adminNamaInput').value = '';
+        document.getElementById('adminUserInput').value = '';
+        document.getElementById('adminPassInput').value = '';
+        loadDaftarAdmin();
+      } else {
+        alert('Gagal menambah admin: ' + error.message);
+      }
+    }
+
+    async function confirmHapusAdmin(idAdmin, username) {
+      if (username === 'admin') {
+        return alert('Admin utama (admin) tidak boleh dihapus!');
+      }
+      if (confirm('Apakah Anda yakin ingin menghapus akun admin "' + username + '"?')) {
+        const { error } = await db.from('admin').delete().eq('id', idAdmin);
+        if (!error) {
+          alert('Admin berhasil dihapus!');
+          loadDaftarAdmin();
+        } else {
+          alert('Gagal hapus admin: ' + error.message);
         }
       }
     }
