@@ -625,7 +625,7 @@
       selectSiswa.innerHTML = '<option value="">Memuat...</option>'; selectSiswa.disabled = true;
 
       const { data: list } = await db.from('data_siswa').select('*').eq('kelas', kelas).eq('status', 'Aktif');
-      globalSiswaList = list || [];
+      globalSiswaList = (list || []).sort((a, b) => a.nama.localeCompare(b.nama));
       selectSiswa.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
       for (var i = 0; i < globalSiswaList.length; i++) {
         selectSiswa.innerHTML += '<option value="' + globalSiswaList[i].nis + '">' + globalSiswaList[i].nama + ' (NIS: ' + globalSiswaList[i].nis + ')</option>';
@@ -676,7 +676,7 @@
       select.innerHTML = '<option value="">Memuat...</option>'; select.disabled = true;
 
       const { data: list } = await db.from('data_siswa').select('*').eq('kelas', kelas).eq('status', 'Aktif');
-      globalSiswaBayarList = list || [];
+      globalSiswaBayarList = (list || []).sort((a, b) => a.nama.localeCompare(b.nama));
       select.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
       for (var i = 0; i < globalSiswaBayarList.length; i++) {
         select.innerHTML += '<option value="' + globalSiswaBayarList[i].nis + '">' + globalSiswaBayarList[i].nama + '</option>';
@@ -788,8 +788,16 @@
       const { data: siswa } = await db.from('data_siswa').select('*').eq('status', 'Aktif');
       const { data: tab } = await db.from('tabungan').select('*');
 
+      // PENGURUTAN: KELAS DULU (ASC), LALU NAMA (A-Z)
+      var sortedSiswa = (siswa || []).sort((a, b) => {
+        if (Number(a.kelas) !== Number(b.kelas)) {
+          return Number(a.kelas) - Number(b.kelas);
+        }
+        return a.nama.localeCompare(b.nama);
+      });
+
       tbody.innerHTML = '';
-      (siswa || []).forEach(s => {
+      sortedSiswa.forEach(s => {
         let saldoAwal = 0, setorBulanIni = 0, tarikBulanIni = 0;
         (tab || []).filter(x => String(x.nis) === String(s.nis)).forEach(tx => {
           var dt = new Date(tx.tanggal);
@@ -827,8 +835,16 @@
       const { data: siswa } = await db.from('data_siswa').select('*').eq('status', 'Aktif');
       const { data: bayar } = await db.from('pembayaran').select('*');
 
+      // PENGURUTAN: KELAS DULU (ASC), LALU NAMA (A-Z)
+      var sortedSiswa = (siswa || []).sort((a, b) => {
+        if (Number(a.kelas) !== Number(b.kelas)) {
+          return Number(a.kelas) - Number(b.kelas);
+        }
+        return a.nama.localeCompare(b.nama);
+      });
+
       tbody.innerHTML = '';
-      (siswa || []).forEach(s => {
+      sortedSiswa.forEach(s => {
         let spp = 0, daftarUlang = 0, kegiatan = 0, donasi = 0, totalBayar = 0;
         (bayar || []).filter(x => String(x.nis) === String(s.nis)).forEach(px => {
           var dt = new Date(px.tanggal);
@@ -1005,9 +1021,10 @@
       select.disabled = true; select.innerHTML = '<option value="">Memuat...</option>';
 
       const { data: list } = await db.from('data_siswa').select('*').eq('kelas', kelas).eq('status', 'Aktif');
+      var sortedList = (list || []).sort((a, b) => a.nama.localeCompare(b.nama));
       select.innerHTML = '<option value="">-- Pilih Siswa --</option>';
-      for (var i = 0; i < (list || []).length; i++) {
-        select.innerHTML += '<option value="' + list[i].nis + '">' + list[i].nama + ' (NIS: ' + list[i].nis + ')</option>';
+      for (var i = 0; i < sortedList.length; i++) {
+        select.innerHTML += '<option value="' + sortedList[i].nis + '">' + sortedList[i].nama + ' (NIS: ' + sortedList[i].nis + ')</option>';
       }
       select.disabled = false;
     }
