@@ -334,6 +334,15 @@
             </div>
 
             <div class="flex flex-wrap gap-2 w-full md:w-auto">
+              <select id="filterKelasRekap" class="border border-slate-200 rounded-xl p-2 text-xs">
+                <option value="ALL">Semua Kelas</option>
+                <option value="1">Kelas 1</option>
+                <option value="2">Kelas 2</option>
+                <option value="3">Kelas 3</option>
+                <option value="4">Kelas 4</option>
+                <option value="5">Kelas 5</option>
+                <option value="6">Kelas 6</option>
+              </select>
               <select id="filterBulan" class="border border-slate-200 rounded-xl p-2 text-xs">
                 <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
                 <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
@@ -776,19 +785,25 @@
     }
 
     async function loadRekapTabungan() {
+      var filterKelas = document.getElementById('filterKelasRekap').value;
       var b = parseInt(document.getElementById('filterBulan').value);
       var t = parseInt(document.getElementById('filterTahun').value);
       var thead = document.getElementById('tabelRekapHead');
       var tbody = document.getElementById('tabelRekapBody');
-      document.getElementById('printJudulRekap').innerText = 'Rekapitulasi Tabungan Siswa - Periode Bulan ' + b + '/' + t;
+      
+      var judulKelas = filterKelas === 'ALL' ? 'Semua Kelas' : 'Kelas ' + filterKelas;
+      document.getElementById('printJudulRekap').innerText = 'Rekapitulasi Tabungan Siswa - ' + judulKelas + ' (Periode Bulan ' + b + '/' + t + ')';
 
       thead.innerHTML = '<tr class="bg-slate-100 text-slate-700 border-b"><th class="p-2.5">NIS</th><th class="p-2.5">Nama</th><th class="p-2.5">Kelas</th><th class="p-2.5">Saldo Awal</th><th class="p-2.5 text-emerald-600">Setor</th><th class="p-2.5 text-rose-600">Tarik</th><th class="p-2.5 font-bold">Saldo Akhir</th><th class="p-2.5 text-center no-print">Aksi</th></tr>';
       tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center">Memuat data...</td></tr>';
 
-      const { data: siswa } = await db.from('data_siswa').select('*').eq('status', 'Aktif');
+      let query = db.from('data_siswa').select('*').eq('status', 'Aktif');
+      if (filterKelas !== 'ALL') {
+        query = query.eq('kelas', filterKelas);
+      }
+      const { data: siswa } = await query;
       const { data: tab } = await db.from('tabungan').select('*');
 
-      // PENGURUTAN: KELAS DULU (ASC), LALU NAMA (A-Z)
       var sortedSiswa = (siswa || []).sort((a, b) => {
         if (Number(a.kelas) !== Number(b.kelas)) {
           return Number(a.kelas) - Number(b.kelas);
@@ -797,6 +812,11 @@
       });
 
       tbody.innerHTML = '';
+      if (sortedSiswa.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400 font-bold">Tidak ada siswa ditemukan di kelas ini.</td></tr>';
+        return;
+      }
+
       sortedSiswa.forEach(s => {
         let saldoAwal = 0, setorBulanIni = 0, tarikBulanIni = 0;
         (tab || []).filter(x => String(x.nis) === String(s.nis)).forEach(tx => {
@@ -823,19 +843,25 @@
     }
 
     async function loadRekapPembayaran() {
+      var filterKelas = document.getElementById('filterKelasRekap').value;
       var b = parseInt(document.getElementById('filterBulan').value);
       var t = parseInt(document.getElementById('filterTahun').value);
       var thead = document.getElementById('tabelRekapHead');
       var tbody = document.getElementById('tabelRekapBody');
-      document.getElementById('printJudulRekap').innerText = 'Rekapitulasi Pembayaran Sekolah - Periode Bulan ' + b + '/' + t;
+
+      var judulKelas = filterKelas === 'ALL' ? 'Semua Kelas' : 'Kelas ' + filterKelas;
+      document.getElementById('printJudulRekap').innerText = 'Rekapitulasi Pembayaran Sekolah - ' + judulKelas + ' (Periode Bulan ' + b + '/' + t + ')';
 
       thead.innerHTML = '<tr class="bg-slate-100 text-slate-700 border-b"><th class="p-2.5">NIS</th><th class="p-2.5">Nama</th><th class="p-2.5">Kelas</th><th class="p-2.5">SPP</th><th class="p-2.5">Daftar Ulang</th><th class="p-2.5">Kegiatan</th><th class="p-2.5">Donasi</th><th class="p-2.5 font-bold">Total Bayar</th><th class="p-2.5 text-center no-print">Aksi</th></tr>';
       tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center">Memuat data...</td></tr>';
 
-      const { data: siswa } = await db.from('data_siswa').select('*').eq('status', 'Aktif');
+      let query = db.from('data_siswa').select('*').eq('status', 'Aktif');
+      if (filterKelas !== 'ALL') {
+        query = query.eq('kelas', filterKelas);
+      }
+      const { data: siswa } = await query;
       const { data: bayar } = await db.from('pembayaran').select('*');
 
-      // PENGURUTAN: KELAS DULU (ASC), LALU NAMA (A-Z)
       var sortedSiswa = (siswa || []).sort((a, b) => {
         if (Number(a.kelas) !== Number(b.kelas)) {
           return Number(a.kelas) - Number(b.kelas);
@@ -844,6 +870,11 @@
       });
 
       tbody.innerHTML = '';
+      if (sortedSiswa.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400 font-bold">Tidak ada siswa ditemukan di kelas ini.</td></tr>';
+        return;
+      }
+
       sortedSiswa.forEach(s => {
         let spp = 0, daftarUlang = 0, kegiatan = 0, donasi = 0, totalBayar = 0;
         (bayar || []).filter(x => String(x.nis) === String(s.nis)).forEach(px => {
